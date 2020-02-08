@@ -1,26 +1,67 @@
-import React from 'react';
+import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.css';
+import * as firebase from 'firebase';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      floor: null,
+      occupied: 'false'
+    };
+  }
+
+  //this is called after inital DOM
+  componentWillMount() {
+    const classRef = firebase.database().ref().child('Classroom');
+    const floorRef = classRef.child('floor');
+    const occRef = classRef.child('occupied');
+    floorRef.on('value', snap => {
+      this.setState({
+        floor: snap.val(),
+      });
+    });
+    occRef.on('value', snap => {
+      this.setState({
+        occupied: snap.val()
+      });
+    });
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+
+    firebase.database().ref().child('Classroom').child('SN11').update({
+      occupied: 'stanley',
+      section: 'A14',
+      floor: 1
+    });
+
+ }
+
+  render() {
+    return (
+      <div className="App">
+        <head>
+          <script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
+        </head>
+        <header className="App-header">
+          <img src={logo} className="App-logo" alt="logo" />
+          <p>
+            Edit <code>src/App.js</code> and save to reload.
+          </p>
+          <button onClick={this.handleSubmit} >Occupied/Leave</button>
+          <p>
+            {this.state.floor}
+          </p>
+          <p>
+            {this.state.occupied}
+          </p>
+        </header>
+      </div>
+    );
+  }
 }
 
 export default App;
