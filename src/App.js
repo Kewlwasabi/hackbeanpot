@@ -8,18 +8,18 @@ class App extends Component {
     super(props);
     this.state = {
       floor: null,
-      occupied: 'false'
+      occupied: null
     };
   }
 
   //this is called after inital DOM
   componentWillMount() {
-    const classRef = firebase.database().ref().child('Classroom');
+    const classRef = firebase.database().ref().child('Classroom').child('SN11');
     const floorRef = classRef.child('floor');
     const occRef = classRef.child('occupied');
     floorRef.on('value', snap => {
       this.setState({
-        floor: snap.val(),
+        floor: snap.val()
       });
     });
     occRef.on('value', snap => {
@@ -54,8 +54,6 @@ class App extends Component {
           <button onClick={this.handleSubmit} >Occupied/Leave</button>
           <p>
             {this.state.floor}
-          </p>
-          <p>
             {this.state.occupied}
           </p>
         </header>
