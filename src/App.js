@@ -2,43 +2,138 @@ import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.css';
 import * as firebase from 'firebase';
+import {ContainerComponent, DropdownComponent2} from './Components/ContainerComponent';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      location: 'SN null',
       currOcc: null,
       maxOcc: null,
       kudos: null,
       name: null,
       init: 'false'
     };
+    this.handleLocationChange = this.handleLocationChange.bind(this);
   }
 
-  compo
+  handleLocationChange(locVal, callback) {
 
-  //this is called after inital DOM
-  componentDidMount() {
-    const classRef = firebase.database().ref().child('Classroom').child('SN11');
-    const occRef = classRef.child('currOcc');
-    const maxRef = classRef.child('maxOcc');
-    occRef.on('value', snap => {
+    const roomRef = firebase.database().ref().child('Classroom')
+    .child(locVal);
+    const currOccRef = roomRef.child('currOcc');
+    const maxOccRef = roomRef.child('maxOcc');
+    maxOccRef.on('value', snap => {
+      this.setState({
+        maxOcc: snap.val()
+      }, () => {console.log("please work", snap.val())})
+    });
+
+    currOccRef.on('value', snap => {
       this.setState({
         currOcc: snap.val()
       });
     });
-    maxRef.on('value', snap => {
-      this.setState({
-        maxOcc: snap.val()
+    this.setState({location : locVal})
+  }
+
+  // populate = (e) => {
+  //   // e.preventDefault();
+  //   console.log(this.state)
+
+  // }
+
+    //this is called after inital DOM
+    componentDidMount() {
+      const classRef = firebase.database().ref().child('Classroom').child('SN11');
+      const occRef = classRef.child('currOcc');
+      const maxRef = classRef.child('maxOcc');
+      occRef.on('value', snap => {
+        this.setState({
+          currOcc: snap.val()
+        });
       });
+      maxRef.on('value', snap => {
+        this.setState({
+          maxOcc: snap.val()
+        });
+      });
+  
+      console.log(this.state.init === 'false')
+      if(this.state.init === 'false') {
+        console.log('auth ran')
+        this.handleAuth();
+      }
+
+      console.log();
+    }
+
+  getClassrooms() {
+    const classR = ['SN11', 'SN12', 'SN13'];
+    const rootRef = firebase.database().ref();
+    // return rootRef.child('Classroom').child('SN11').child('currOcc').
+    rootRef.child('Classroom').on("value", snap=> {
+      const foo = snap.val();
+      console.log(foo);
+      const dataArr = [1,2,3];
+      Object.keys(foo).forEach(key => {
+        console.log(key);
+        let maxO = foo[key]['maxOcc'];
+        let currO = foo[key]['currOcc'];
+        dataArr.push({
+          room: key,
+          maxVal: maxO,
+          curVal: currO
+        });
+      })
+      return dataArr;
+    })
+  }
+
+  getSN11() {
+    const rootRef = firebase.database().ref().child('Classroom').child('SN11');
+    const currOcc = rootRef.child('currOcc');
+    const maxOcc = rootRef.child('maxOcc');
+    var x = [0,0];
+    currOcc.on('value', snap => {
+      x[0] = snap.val()
+    });
+    maxOcc.on('value', snap => {
+      x[1] = snap.val()
     });
 
-    console.log(this.state.init === 'false')
-    if(this.state.init === 'false') {
-      console.log('auth ran')
-      this.handleAuth();
-    }
+    return x;
+  }
+
+  getSN12() {
+    const rootRef = firebase.database().ref().child('Classroom').child('SN12');
+    const currOcc = rootRef.child('currOcc');
+    const maxOcc = rootRef.child('maxOcc');
+    var x = [0,0];
+    currOcc.on('value', snap => {
+      x[0] = snap.val()
+    });
+    maxOcc.on('value', snap => {
+      x[1] = snap.val()
+    });
     
+    return x;
+  }
+
+  getSN13() {
+    const rootRef = firebase.database().ref().child('Classroom').child('SN13');
+    const currOcc = rootRef.child('currOcc');
+    const maxOcc = rootRef.child('maxOcc');
+    var x = [0,0];
+    currOcc.on('value', snap => {
+      x[0] = snap.val()
+    });
+    maxOcc.on('value', snap => {
+      x[1] = snap.val()
+    });
+    
+    return x;
   }
 
   handleAuth = () => {
@@ -73,6 +168,11 @@ class App extends Component {
                   kudos: kudos + 1
                   })
               });
+              fooRef.child(key).once('value', snap => {
+                this.setState({
+                  kudos: snap.child('kudos').val()
+                });
+              }              )
               //change init flag to true
               this.setState ({
                 init: 'true'
@@ -106,34 +206,55 @@ class App extends Component {
     });
   }
 
-  handleSubmit(e) {
-    e.preventDefault();
+  handleSubmitAdd = (e) => {
+    // e.preventDefault();
+    if (this.state.currOcc == this.state.maxOcc) {
+      alert('Max occupency reached')
+    }
+    else {
+      firebase.database().ref().child('Classroom').child(this.state.location).update({
+        currOcc: this.state.currOcc + 1
+      });
+    }
+  }
 
-    firebase.database().ref().child('Classroom').child('SN11').update({
-      currOcc: 11,
-      maxOcc: 12
-    });
- }
+  handleSubmitSub = (e) => {
+    // e.preventDefault();
+    if (this.state.currOcc == 0) {
+      alert('There is nobody in this room');
+    }
+    else {
+      firebase.database().ref().child('Classroom').child(this.state.location).update({
+        currOcc: this.state.currOcc - 1
+      });
+    }
+  }
+  
 
   render() {
     return (
       <div className="App">
-        <head>
-          <script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
-        </head>
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <button onClick={this.handleSubmit} >Occupied/Leave</button>
-          <p>
-            {this.state.currOcc}
-            {this.state.maxOcc}
-            {this.state.name}
-            {this.state.kudos}
-          </p>
-        </header>
+        {/*}<header className="App-header">
+        <button onClick=
+        {this.populate}
+        >Populate</button>
+        <button onClick=
+        {this.handleSubmitAdd}
+        >Occupy</button>
+        <button onClick=
+        {this.handleSubmitSub}
+        >Leave</button>
+        <p>
+        {this.state.currOcc}
+        </p>
+        <p>
+        {this.state.maxOcc}
+        </p>
+        </header>*/}
+        <ContainerComponent onLocChange = {this.handleLocationChange}
+          populate = {this.populate} submitAdd = {this.handleSubmitAdd}
+          submitSub= {this.handleSubmitSub} kudos = {this.state.kudos}
+          maxOcc={this.state.maxOcc} sn11={this.getSN11()} sn12={this.getSN12()} sn13={this.getSN13()}/>
       </div>
     );
   }

@@ -36,3 +36,57 @@
     transform: rotate(360deg);
   }
 }
+
+#div-kudos {
+  background-color: #D41B2C;
+  color: white;
+  text-align: center;
+  font-family: fantasy;
+  font-size: 50px;
+}
+
+#media {
+  background-color: #D41B2C;
+}
+
+#div-form {
+  margin-top : 20px;
+  margin-left: 600px;
+  margin-right: 600px;
+  margin-bottom: 100px;
+}
+
+#div-logo {
+  margin-top : 20px;
+  margin-left: 600px;
+  margin-right: 600px;
+  font-family: fantasy;
+  font-size: 90px;
+  text-align: center;
+}
+
+#study {
+  text-align: center;
+}
+
+#div-density1 {
+  margin-left: 50px;
+  margin-right: 50px;
+  display: inline-block;
+}
+
+#div-density2 {
+  margin-left: 50px;
+  margin-right: 50px;
+  display: inline-block;
+}
+#div-density3 {
+  margin-left: 50px;
+  margin-right: 50px;
+  display: inline-block;
+}
+
+#huskyimg {
+  width: 200px;
+  height: 200px;
+}
